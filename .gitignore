@@ -1,3 +1,5 @@
 composer.lock
 vendor/
 assets/
+.env
+.php_cs.cache

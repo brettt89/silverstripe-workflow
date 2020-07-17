@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ruleset name="SilverStripe">
+    <description>CodeSniffer ruleset</description>
+
+    <file>src</file>
+    <file>tests</file>
+
+    <!-- base rules -->
+    <rule ref="PSR2"/>
+</ruleset>

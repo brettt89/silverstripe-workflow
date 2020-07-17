@@ -7,17 +7,9 @@ on:
     branches: [ master ]
 
 jobs:
-  build:
+  build-test:
 
     runs-on: ubuntu-latest
-    
-    services:
-      mysql:
-        image: mysql:5.7
-        env:
-            MYSQL_ALLOW_EMPTY_PASSWORD: yes
-        ports:
-            - 3306
 
     steps:
     - uses: actions/checkout@v2
@@ -25,12 +17,14 @@ jobs:
     - name: Validate composer.json and composer.lock
       run: composer validate
 
+    - name: Install SQLite3
+      run: composer require --no-update silverstripe/sqlite3
+
     - name: Install dependencies
-      run: composer install --prefer-dist --no-progress --no-suggest
+      run: composer install --prefer-dist --no-interaction --no-progress --no-suggest --optimize-autoloader --verbose --profile
 
     - name: Execute tests
       run: vendor/bin/phpunit
       env:
-        SS_DATABASE_USERNAME: root
-        SS_DATABASE_PASSWORD: ''
-        SS_DATABASE_PORT: ${{ job.services.mysql.ports[3306] }}
+        SS_DATABASE_CLASS: SQLite3Database
+        SS_SQLITE_DATABASE_PATH: /tmp/database-file
