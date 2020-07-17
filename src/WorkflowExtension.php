@@ -40,7 +40,7 @@ class WorkflowExtension extends DataExtension
      */
     public function __construct(array $extensions = [], Registry $registry = null)
     {
-        parent::construct();
+        parent::__construct();
 
         // Extensible trait is required.
         if (!in_array(Extensible::class, class_uses($this->owner))) {
