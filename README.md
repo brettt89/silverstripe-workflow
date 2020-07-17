@@ -1,6 +1,6 @@
 # SilverStripe Workflow Module
 
-![PHPUnit Tests](https://github.com/brettt89/silverstripe-workflow/workflows/Tests/badge.svg)
+![PHPUnit Tests](https://github.com/brettt89/silverstripe-workflow/workflows/PHPUnit%20Tests/badge.svg)
 
 ## Overview
 

@@ -1,8 +1,11 @@
-name: Tests
+name: PHPUnit Tests
 
 on:
   push:
     branches: [ master ]
+    paths-ignore:
+    - 'README.md'
+
   pull_request:
     branches: [ master ]
 
