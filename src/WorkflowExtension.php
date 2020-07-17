@@ -1,13 +1,13 @@
 <?php
 
+namespace Silverstripe\Workflow;
+
 use SilverStripe\ORM\DataExtension;
 use SilverStripe\ORM\ValidationException;
 use SilverStripe\Core\Extensible;
 use Symfony\Component\Workflow\Registry;
 use Symfony\Component\Workflow\Exception\LogicException;
 use \Exception;
-
-namespace Silverstripe\Workflow;
 
 class WorkflowExtension extends DataExtension
 {   
