@@ -1,34 +1,16 @@
 <?php
 
 use SilverStripe\ORM\DataExtension;
+use SilverStripe\ORM\ValidationException;
+use SilverStripe\Core\Extensible;
 use Symfony\Component\Workflow\Registry;
-use Symfony\Component\Workflow\Transition;
-use Symfony\Component\Workflow\MarkingStore\MethodMarkingStore;
-use Symfony\Component\Workflow\SupportStrategy\InstanceOfSupportStrategy;
+use Symfony\Component\Workflow\Exception\LogicException;
+use \Exception;
 
 namespace Silverstripe\Workflow;
 
 class WorkflowExtension extends DataExtension
 {   
-    private static $db = [
-        'CurrentState' => 'Varchar'
-    ];
-    
-    /**
-     * @var string
-     */
-    public $stateProperty;
-
-    /**
-     * @var Registry
-     */
-    private $registry;
-
-    /**
-     * @var MarkingStoreInterface
-     */
-    private $markingStore;
-
     /**
      * Array of Extension points and corresponding Workflows and transitions
      * E.g.
@@ -38,63 +20,69 @@ class WorkflowExtension extends DataExtension
      * )
      * @var array
      */
-    private $extensions = [];
+    private $extensions;
+    
+    /**
+     * @var Registry
+     */
+    private $registry;
 
     /**
-     * @param MarkingStoreInterface    Marking store
+     * Dependancy mapping for Injector
      */
-    public function __construct(\Symfony\Component\Workflow\MarkingStore\MarkingStoreInterface $markingStore = null)
+    static $dependencies = [
+        'extension' => [],
+        'registry'  => '%$Registry'
+    ];
+
+    /**
+     * @param array $extension Extensions to register.
+     */
+    public function __construct(array $extensions = [], Registry $registry = null)
     {
         parent::construct();
 
-        if (!isset($this->stateProperty)) {
-            $this->stateProperty = array_key_first(self::$db);
+        // Extensible trait is required.
+        if (!in_array(Extensible::class, class_uses($this->owner))) {
+            throw new Exception(sprintf('Unable to extend, Class \'%s\' must use Extensible Trait'), $this->owner->getClassName());
         }
 
-        $this->registry = new Registry();
-        $this->markingStore = $method ?: new MethodMarkingStore(true, $this->stateProperty);
+        if ($registry) {
+            $this->setRegistry($registry);
+        }
+
+        $this->setExtensions($extensions);
     }
 
     /**
-     * Return current state from the database.
+     * Public method for setting all Extensions in one hit
      * 
-     * @return string
+     * @param array $extensions
      */
-    public function getCurrentState()
-    {
-        return $this->owner->CurrentState;
+    public function setExtensions(array $extensions) {
+        foreach ($extensions as $extension => $wfData) {
+            foreach ($wfData as $workflow => $transition) {
+                $this->setWorkflowTransition($extension, $workflow, $transition);
+            }
+        }
     }
 
     /**
-     * Update the current state in the database.
+     * Public method for setting Registry
      * 
-     * @param string $state State of current workflow.
+     * @param array $extensions
      */
-    public function setCurrentState(string $state)
-    {
-        $this->owner->CurrentState = $state;
+    public function setRegistry(Registry $registry) {
+        $this->registry = $registry;
     }
 
     /**
-     * Add Workflow to registry with a SupportStrategy defined for extended object.
+     * Public method for setting Registry
      * 
-     * @param WorkflowInterface                 $workflow           Workflow to add
-     * @param WorkflowSupportStrategyInterface  $supportStrategy    Support Strategy to use
+     * @param array $extensions
      */
-    public function addWorkflowStrategy(
-        Symfony\Component\Workflow\WorkflowInterface $workflow,
-        \Symfony\Component\Workflow\SupportStrategy\WorkflowSupportStrategyInterface $supportStrategy
-    ) {
-        $this->registry->addWorkflow($workflow, $supportStrategy);
-    }
-
-    /**
-     * Add Workflow to registry for extended object.
-     * 
-     * @param WorkflowInterface $workflow Workflow to add
-     */
-    public function addWorkflow(Symfony\Component\Workflow\WorkflowInterface $workflow) {
-        $this->addWorkflowStrategy($workflow, new InstanceOfSupportStrategy($this->owner->getClassName()));
+    public function getRegistry() {
+        return $this->registry;
     }
 
     /**
@@ -106,7 +94,7 @@ class WorkflowExtension extends DataExtension
      */
     public function hasWorkflow(string $extension) {
         if (array_key_exists($extension, $this->extensions)) {
-            if (is_array($this->extensions[$extension]) && count($this->extensions[$extension]) === 1) {
+            if (is_array($this->extensions[$extension]) && count($this->extensions[$extension]) >= 1) {
                 foreach ($this->extensions[$extension] as $workflow => $transition) {
                     if (!is_string($workfow) || !is_string($transition)) {
                         return false;
@@ -125,10 +113,9 @@ class WorkflowExtension extends DataExtension
      * 
      * @return WorkflowInterface    Workflow registered for this Extension.
      */
-    public function getWorkflow(string $extension) {
+    public function getWorkflows(string $extension) {
         if ($this->hasWorkflow($extension)) {
-            $wfName = array_key_first($this->extensions[$extension]);
-            return $this->registry->get($this->owner, $wfName);
+            return $this->extensions[$extension];
         }
     }
 
@@ -139,20 +126,12 @@ class WorkflowExtension extends DataExtension
      * @param string|WorfklowInterface  $workflow      Workflow name
      * @param string|Transition         $transition    Transition name
      */
-    public function setWorkflowTransition(string $extension, $workflow, $transition) {
-        if ($this->hasWorkflow($extension)) {
-            user_error(sprintf('Extension \'%s\' alreay has a workflow', $extension), E_USER_WARNING);
+    public function setWorkflowTransition(string $extension, string $workflow, string $transition) {
+        if (!isset($this->extensions[$extension])) {
+            $this->extensions[$extension] = [(string) $workflow => (string) $transition];
+        } else {
+            $this->extensions[$extension][(string) $workflow] = (string) $transition;
         }
-
-        if ($workflow instanceof WorfklowInterface) {
-            $workflow = $workflow->getName();
-        }
-
-        if ($transition instanceof Transition) {
-            $transition = $transition->getName();
-        }
-
-        $this->extensions[$extension] = [(string) $workflow => (string) $transition];
     }
 
     /**
@@ -165,43 +144,25 @@ class WorkflowExtension extends DataExtension
     }
 
     /**
-     * Get Workflow by extension name
-     * 
-     * @param string                Extension name (e.g. updateValidator)
-     * 
-     * @return WorkflowInterface    Workflow registered for this Extension.
-     */
-    public function getTransition(string $extension) {
-        if ($this->hasWorkflow($extension)) {
-            return reset($this->extensions[$extension]);
-        }
-    }
-
-    /**
      * If Extension has a registered Workflow and transition. Execute it.
+     * 
+     * @param string $func Name of function being called.
+     * @param array $params Array of parameters provided to funciton (ignored)
+     * 
+     * @throws ValidationException
      */
     public function __call($func, $params) {
-        $extension = $func;
-        if (!$this->hasWorkflow($extension)) {
+        if (!$this->hasWorkflow($func)) {
             return;
         }
 
-        $workflow = $this->getWorkflow($extension);
-        $transition = $this->getTransition($extension);
-
-        if ($workflow->can($this->owner, $transition)) {
-            $workflow->apply($this->owner, $transition);
-        } else {
-            if ($extension === 'validate' && count($params) >= 1) {
-                $result = $params[0];
-                $result->addError('Unable to transition to next phase');
-                return $result;
+        foreach($this->getWorkflows($func) as $workflowName => $transition) {
+            $workflow = $this->getRegistry()->get($this->owner, $workflowName);
+            try {
+                $workflow->apply($this->owner, $transition);
+            } catch (LogicException $e) {
+                throw new ValidationException($e->getMessage(), $e->getCode());
             }
-
-
-            // @todo ERROR? Warning? Stop things from happening?
-            //
-            // This is probably where the main stuff happpens
         }
     }
 }
