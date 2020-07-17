@@ -67,13 +67,26 @@ class Blog extends DataObject
         'CurrentState' => 'Varchar',
     ];
 
-    public function postComment($comment)
+    public function publishComment($comment)
     {
         $workflow = WorkflowService::registry()->get($this);
         if (!$workflow->can($this, 'publish')) {
             trigger_error('Not able to move to next phase');
             exit();
         }
+        workflow->apply($this, 'publish');
+        // {Publish $comment code}
+    }
+
+    public function approveComment($comment)
+    {
+        $workflow = WorkflowService::registry()->get($this);
+        if (!$workflow->can($this, 'reviewed')) {
+            trigger_error('Not able to move to next phase');
+            exit();
+        }
+        workflow->apply($this, 'reviewed');
+        // {Approve $comment code}
     }
 }
 
