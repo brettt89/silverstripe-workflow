@@ -1,5 +1,7 @@
 # SilverStripe Workflow Module
 
+![PHPUnit Tests](https://github.com/brettt89/silverstripe-workflow/workflows/Tests/badge.svg)
+
 ## Overview
 
 This Workflow module uses a static interface for interacting with the WorkflowService. You can call Workflow actions from anywhere needed. 
