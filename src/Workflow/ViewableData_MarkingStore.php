@@ -2,6 +2,8 @@
 
 namespace SilverStripe\Workflow;
 
+use SilverStripe\View\ViewableData;
+use Symfony\Component\Workflow\Exception\InvalidArgumentException;
 use Symfony\Component\Workflow\Exception\LogicException;
 use Symfony\Component\Workflow\Marking;
 use Symfony\Component\Workflow\MarkingStore\MarkingStoreInterface;
@@ -27,6 +29,10 @@ class ViewableData_MarkingStore implements MarkingStoreInterface
      */
     public function getMarking(object $subject): Marking
     {
+        if (!$subject instanceof ViewableData) {
+            throw new InvalidArgumentException(sprintf('"%s" is not an instance of "%s"', get_debug_type($subject), ViewableData::class));
+        }
+
         if (!$subject->hasField($this->property)) {
             throw new LogicException(sprintf('Field "%s" does not exist in "%s".', $this->property, get_debug_type($subject)));
         }
@@ -51,14 +57,18 @@ class ViewableData_MarkingStore implements MarkingStoreInterface
      */
     public function setMarking(object $subject, Marking $marking, array $context = [])
     {
-        $marking = $marking->getPlaces();
-
-        if ($this->singleState) {
-            $marking = key($marking);
+        if (!$subject instanceof ViewableData) {
+            throw new InvalidArgumentException(sprintf('"%s" is not an instance of "%s"', get_debug_type($subject), ViewableData::class));
         }
 
         if (!$subject->hasField($this->property)) {
             throw new LogicException(sprintf('Field "%s" does not exist in "%s".', $this->property, get_debug_type($subject)));
+        }
+
+        $marking = $marking->getPlaces();
+
+        if ($this->singleState) {
+            $marking = key($marking);
         }
 
         $subject->{$this->property} = $marking;
