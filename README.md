@@ -16,7 +16,7 @@ Provides `symfony/workflow` functionality to SilverStripe Framework.
 ## Installation
 
 ```
-composer require silverstripe/workflow
+composer require silverstripe/silverstripe-workflow
 ```
 
 ## Introduction
