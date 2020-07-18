@@ -21,11 +21,11 @@ composer require silverstripe/workflow
 
 ## Introduction
 
-The [WorkflowService](src/Workflow/WorkflowService.php) class is your primary engagement point for all Workflow related activies. It holds a static registry of all Workflows created for your application.
+The `WorkflowService` class is your primary engagement point for all Workflow related activies. It holds a static registry of all Workflows created for your application.
 
-The registry returned by [WorkflowService](src/Workflow/WorkflowService.php) is a [Symfony Workflow Registry](https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Workflow/Registry.php) class.
+The registry returned by `WorkflowService` is a [Symfony Workflow Registry](https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Workflow/Registry.php) class.
 
-You can interact with the Workflow Registry by calling the `registry()` command on the [WorkflowService](src/Workflow/WorkflowService.php) class.
+You can interact with the Workflow Registry by calling the `registry()` command on the `WorkflowService` class.
 
 ```
 $registry = WorkflowService::registry();
@@ -79,7 +79,7 @@ use SilverStripe\Workflow\WorkflowService;
 class BlogArtice extends DataObject
 {   
     // ...
-    
+
     public function publishComment(Comment $comment)
     {
         $workflow = WorkflowService::registry()->get($comment);

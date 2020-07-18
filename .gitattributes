@@ -1,0 +1,4 @@
+/tests            export-ignore
+/.editorconfig    export-ignore
+/.eslintrc        export-ignore
+/.gitattributes   export-ignore

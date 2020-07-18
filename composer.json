@@ -9,6 +9,7 @@
         }
     ],
     "require": {
+        "php": "^7.2",
         "silverstripe/framework": "^4.3",
         "symfony/workflow": "^5.1"
     },
@@ -19,10 +20,10 @@
         "friendsofphp/php-cs-fixer": "^2.16"
     },
     "autoload": {
-        "psr-4": {
-            "SilverStripe\\Workflow\\": "src/",
-            "SilverStripe\\Workflow\\Tests\\": "tests/"
-        }
+        "psr-4": { "SilverStripe\\Workflow\\": "src/" }
+    },
+    "autoload-dev": {
+        "psr-4": { "SilverStripe\\Workflow\\Tests\\": "tests/" }
     },
     "minimum-stability": "dev",
     "prefer-stable": true
