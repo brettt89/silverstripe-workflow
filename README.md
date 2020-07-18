@@ -72,7 +72,7 @@ $workflow = WorkflowService::registry()->get(new App\Entity\BlogPost(), 'MyWorkf
 Alternatively you can defined the workflow in PHP as per usual.
 
 ```
-use SilverStripe\Workflow\ViewableDataMarkingStore;
+use SilverStripe\Workflow\DataObjectMarkingStore;
 use SilverStripe\Workflow\WorkflowService;
 use Symfony\Component\Workflow\DefinitionBuilder;
 use Symfony\Component\Workflow\SupportStrategy\InstanceOfSupportStrategy;
@@ -90,7 +90,7 @@ $definition = $definitionBuilder->addPlaces(['draft', 'reviewed', 'rejected', 'p
 
 $singleState = true; // true if the subject can be in only one state at a given time
 $property = 'CurrentState'; // subject property name where the state is stored
-$marking = new ViewableDataMarkingStore($singleState, $property);
+$marking = new DataObjectMarkingStore($singleState, $property);
 $workflow = new Workflow($definition, $marking);
 ```
 
@@ -100,7 +100,8 @@ Then add the Workflow to the Registry.
 WorkflowService::registry()->addWorkflow($testWorkflow, new InstanceOfSupportStrategy(MyApp\MyDataObject::class));
 ```
 
-> A `ViewableDataMarkingStore` class has been provided for easy usage with DataObjects and any other class that extends `ViewableData`. Using this store will allow you to define a Database Field as the "State Storage" propery.
+> A `DataObjectMarkingStore` class has been provided for easy usage with DataObjects and any other class that extends `ViewableData`. Using this store will allow you to define a Database Field as the "State Storage" propery.
+> NOTE: This will trigger a `write` whenever a transition occurs to update the State on the object.
 
 ## Impementing a Workflow
 
