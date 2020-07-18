@@ -10,15 +10,28 @@ on:
     branches: [ master ]
 
 jobs:
-  build-test:
+  build:
 
     runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v2
 
-    - name: Validate composer.json and composer.lock
+    - name: Validate composer.json
       run: composer validate
+
+    - name: Get Composer Cache Directory
+      id: composer-cache
+      run: |
+        echo "::set-output name=dir::$(composer config cache-files-dir)"
+
+    - name: Cache Composer Downloads
+      uses: actions/cache@v1
+      with:
+        path: ${{ steps.composer-cache.outputs.dir }}
+        key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
+        restore-keys: |
+          ${{ runner.os }}-composer-
 
     - name: Install SQLite3
       run: composer require --no-update silverstripe/sqlite3
