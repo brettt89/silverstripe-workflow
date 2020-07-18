@@ -2,6 +2,9 @@
     "name": "silverstripe/silverstripe-workflow",
     "description": "Adds configurable workflow support to the ORM",
     "keywords": ["silverstripe", "workflow"],
+    "license": [
+        "BSD-3-Clause"
+    ],
     "authors": [
         {
             "name": "Brett Tasker",
