@@ -1,6 +1,6 @@
 <?php
 
-namespace SilverStripe\Workflow\Tests\ServiceTest;
+namespace SilverStripe\Workflow\Tests\WorkflowServiceTest;
 
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;

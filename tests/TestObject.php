@@ -1,6 +1,6 @@
 <?php
 
-namespace SilverStripe\Workflow\Tests\ServiceTest;
+namespace SilverStripe\Workflow\Tests;
 
 use SilverStripe\Dev\TestOnly;
 use SilverStripe\ORM\DataObject;
@@ -15,10 +15,8 @@ class TestObject extends DataObject implements TestOnly
         'CurrentState' => 'Varchar',
     ];
 
-    public function onBeforeWrite()
+    public function publish()
     {
-        parent::onBeforeWrite();
-
         try {
             WorkflowService::registry()->get($this)->apply($this, 'publish');
         } catch (LogicException $e) {

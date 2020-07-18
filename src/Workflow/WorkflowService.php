@@ -7,14 +7,13 @@ use Symfony\Component\Workflow\Registry;
 use SilverStripe\Core\Injector\Injectable;
 
 class WorkflowService implements Resettable
-{
-    use Injectable;
+{   
     
     /**
      * @var Registry Workflow Registry
      */
     private static $registry;
-
+    
     /**
      * Public method for getting Registry.
      *

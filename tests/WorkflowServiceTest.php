@@ -3,7 +3,7 @@
 namespace SilverStripe\Workflow\Tests;
 
 use SilverStripe\Dev\SapphireTest;
-use SilverStripe\Workflow\ViewableData_MarkingStore;
+use SilverStripe\Workflow\MarkingStore\DataObjectMarkingStore;
 use SilverStripe\Workflow\WorkflowService;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Workflow\DefinitionBuilder;
@@ -11,10 +11,10 @@ use Symfony\Component\Workflow\SupportStrategy\InstanceOfSupportStrategy;
 use Symfony\Component\Workflow\Transition;
 use Symfony\Component\Workflow\Workflow;
 
-class ServiceTest extends SapphireTest
+class WorkflowServiceTest extends SapphireTest
 {
     public static $extra_dataobjects = [
-        ServiceTest\TestObject::class,
+        TestObject::class,
     ];
 
     public function tearDown()
@@ -30,17 +30,25 @@ class ServiceTest extends SapphireTest
         $this->expectException(\PHPUnit_Framework_Error::class);
         $this->expectExceptionMessage('Transition "publish" is not enabled for workflow "unnamed".');
         
-        $object = new ServiceTest\TestObject();
+        $object = new TestObject();
         $object->write();
+
+        // Publish (workflow action)
+        $object->publish();
     }
 
     public function testGoodWorkflow()
     {
         $this->setUpBasicDataObjectWorkflow();
         
-        $object = new ServiceTest\TestObject();
+        $object = new TestObject();
         $object->CurrentState = 'reviewed';
         $object->write();
+
+        // Publish (workflow action)
+        $object->publish();
+
+        $this->assertEquals('published', $object->CurrentState);
     }
 
     public function testLoggerEventSubscriber()
@@ -66,18 +74,21 @@ class ServiceTest extends SapphireTest
 
 		$mockLogger->expects($this->once())
             ->method('info')
-            ->with($this->equalTo('Blog post (id: "0") performed transition "publish" from "" to "published"'));
+            ->with($this->equalTo('Blog post (id: "3") performed transition "publish" from "" to "published"'));
         
         // Create EventDispatcher and add Test Subscriber.
         $dispatcher = new EventDispatcher();
-        $dispatcher->addSubscriber(new ServiceTest\TestLoggerEventSubscriber($mockLogger));
+        $dispatcher->addSubscriber(new WorkflowServiceTest\TestLoggerEventSubscriber($mockLogger));
         
         // Create basic DataObject Workflow and give dispatcher to Workflow.
         $this->setUpBasicDataObjectWorkflow($dispatcher);
 
-        $object = new ServiceTest\TestObject();
+        $object = new TestObject();
         $object->CurrentState = 'reviewed';
         $object->write();
+
+        // Publish (workflow action)
+        $object->publish();
     }
 
     /**
@@ -87,12 +98,11 @@ class ServiceTest extends SapphireTest
     {
         $definition = $this->getTestBlogDefinition();
 
-        $singleState = true; // true if the subject can be in only one state at a given time
         $property = 'CurrentState'; // subject property name where the state is stored
-        $marking = new ViewableData_MarkingStore($singleState, $property);
+        $marking = new DataObjectMarkingStore($property);
         $testWorkflow = new Workflow($definition, $marking, $dispatcher);
         
-        WorkflowService::registry()->addWorkflow($testWorkflow, new InstanceOfSupportStrategy(ServiceTest\TestObject::class));
+        WorkflowService::registry()->addWorkflow($testWorkflow, new InstanceOfSupportStrategy(TestObject::class));
     }
 
     /**

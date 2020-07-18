@@ -1,6 +1,6 @@
 <?php
 
-namespace SilverStripe\Workflow;
+namespace SilverStripe\Workflow\MarkingStore;
 
 use SilverStripe\View\ViewableData;
 use Symfony\Component\Workflow\Exception\InvalidArgumentException;
@@ -8,19 +8,17 @@ use Symfony\Component\Workflow\Exception\LogicException;
 use Symfony\Component\Workflow\Marking;
 use Symfony\Component\Workflow\MarkingStore\MarkingStoreInterface;
 
-class ViewableData_MarkingStore implements MarkingStoreInterface
+class ViewableDataMarkingStore implements MarkingStoreInterface
 {
-    private $singleState;
     private $property;
 
     /**
      * @param string $property Used to determine methods to call
-     *                         The `getMarking` method will use `return $subject->Property`
-     *                         The `setMarking` method will use `$subject->Property = (string)`
+     *                         The `getMarking` method will use `return $subject->getField(Property)`
+     *                         The `setMarking` method will use `$subject->setField(property, (string))`
      */
-    public function __construct(bool $singleState = false, string $property = 'marking')
+    public function __construct(string $property = 'marking')
     {
-        $this->singleState = $singleState;
         $this->property = $property;
     }
 
@@ -34,7 +32,7 @@ class ViewableData_MarkingStore implements MarkingStoreInterface
         }
 
         if (!$subject->hasField($this->property)) {
-            throw new LogicException(sprintf('Field "%s" does not exist in "%s".', $this->property, get_debug_type($subject)));
+            throw new LogicException(sprintf('Field "%s" does not exist in "%s"', $this->property, get_debug_type($subject)));
         }
 
         $marking = $subject->getField($this->property);
@@ -43,11 +41,7 @@ class ViewableData_MarkingStore implements MarkingStoreInterface
             return new Marking();
         }
 
-        if ($this->singleState) {
-            $marking = [(string) $marking => 1];
-        }
-
-        return new Marking($marking);
+        return new Marking([(string) $marking => 1]);
     }
 
     /**
@@ -62,15 +56,11 @@ class ViewableData_MarkingStore implements MarkingStoreInterface
         }
 
         if (!$subject->hasField($this->property)) {
-            throw new LogicException(sprintf('Field "%s" does not exist in "%s".', $this->property, get_debug_type($subject)));
+            throw new LogicException(sprintf('Field "%s" does not exist in "%s"', $this->property, get_debug_type($subject)));
         }
 
         $marking = $marking->getPlaces();
 
-        if ($this->singleState) {
-            $marking = key($marking);
-        }
-
-        $subject->{$this->property} = $marking;
+        $subject->setField($this->property, key($marking));
     }
 }
