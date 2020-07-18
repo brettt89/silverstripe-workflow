@@ -33,10 +33,46 @@ $registry = WorkflowService::registry();
 
 ## Adding a Symfony Workflow
 
-Creating a workflow in PHP is the same process as with Symfony Workflow documentation.
+This package comes with a `WorkflowFactory` to help generate workflows using the same schema as Symfony.
 
 ```
-use SilverStripe\Workflow\ViewableData_MarkingStore;
+SilverStripe\Core\Injector\Injector:
+  MyWorkflow:
+    factory: Silverstripe\Workflow\WorkflowFactory
+    properties:
+      marking_store:
+        type: 'DataObject'
+        property: 'currentPlace'
+      supports:
+        - App\Entity\BlogPost
+      initial_marking: draft
+      places:
+        - draft
+        - reviewed
+        - rejected
+        - published
+      transitions:
+        to_review:
+          from: draft
+          to:   reviewed
+        publish:
+          from: reviewed
+          to:   published
+        reject:
+          from: reviewed
+          to:   rejected
+```
+
+You can reference these as per usual.
+
+```
+$workflow = WorkflowService::registry()->get(new App\Entity\BlogPost(), 'MyWorkflow');
+```
+
+Alternatively you can defined the workflow in PHP as per usual.
+
+```
+use SilverStripe\Workflow\ViewableDataMarkingStore;
 use SilverStripe\Workflow\WorkflowService;
 use Symfony\Component\Workflow\DefinitionBuilder;
 use Symfony\Component\Workflow\SupportStrategy\InstanceOfSupportStrategy;
@@ -54,7 +90,7 @@ $definition = $definitionBuilder->addPlaces(['draft', 'reviewed', 'rejected', 'p
 
 $singleState = true; // true if the subject can be in only one state at a given time
 $property = 'CurrentState'; // subject property name where the state is stored
-$marking = new ViewableData_MarkingStore($singleState, $property);
+$marking = new ViewableDataMarkingStore($singleState, $property);
 $workflow = new Workflow($definition, $marking);
 ```
 
@@ -64,7 +100,7 @@ Then add the Workflow to the Registry.
 WorkflowService::registry()->addWorkflow($testWorkflow, new InstanceOfSupportStrategy(MyApp\MyDataObject::class));
 ```
 
-> A `ViewableData_MarkingStore` class has been provided for easy usage with DataObjects and any other class that extends `ViewableData`. Using this store will allow you to define a Database Field as the "State Storage" propery.
+> A `ViewableDataMarkingStore` class has been provided for easy usage with DataObjects and any other class that extends `ViewableData`. Using this store will allow you to define a Database Field as the "State Storage" propery.
 
 ## Impementing a Workflow
 
