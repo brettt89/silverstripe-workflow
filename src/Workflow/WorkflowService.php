@@ -4,9 +4,12 @@ namespace SilverStripe\Workflow;
 
 use SilverStripe\Core\Resettable;
 use Symfony\Component\Workflow\Registry;
+use SilverStripe\Core\Injector\Injectable;
 
 class WorkflowService implements Resettable
 {
+    use Injectable;
+    
     /**
      * @var Registry Workflow Registry
      */
