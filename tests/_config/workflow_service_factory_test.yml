@@ -1,4 +1,6 @@
 SilverStripe\Core\Injector\Injector:
+  EventDispatcher:
+    class: Symfony\Component\EventDispatcher\EventDispatcher
   MyWorkflow:
     factory: SilverStripe\Workflow\WorkflowServiceFactory
     constructor:
@@ -7,6 +9,7 @@ SilverStripe\Core\Injector\Injector:
         property: 'CurrentState'
       supports:
         - SilverStripe\Workflow\Tests\TestObject
+      dispatcher: '%$EventDispatcher'
       initial_marking: draft
       places:
         - draft

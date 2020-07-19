@@ -2,7 +2,7 @@
 
 Your Workflow can be accessed from anywher inside of a SilverStripe application, so usage of Workflows can be expanded on almost anywhere. Below is a example of how a Workflow might be used when publishing a comment on a blog article.
 
-```
+```php
 namespace MyApp;
 
 use SilverStripe\ORM\DataObject;
