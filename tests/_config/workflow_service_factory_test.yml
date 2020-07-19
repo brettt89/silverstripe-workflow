@@ -1,0 +1,25 @@
+SilverStripe\Core\Injector\Injector:
+  MyWorkflow:
+    factory: SilverStripe\Workflow\WorkflowServiceFactory
+    constructor:
+      marking_store:
+        type: 'DataObject'
+        property: 'CurrentState'
+      supports:
+        - SilverStripe\Workflow\Tests\TestObject
+      initial_marking: draft
+      places:
+        - draft
+        - reviewed
+        - rejected
+        - published
+      transitions:
+        to_review:
+          from: draft
+          to:   reviewed
+        publish:
+          from: reviewed
+          to:   published
+        reject:
+          from: reviewed
+          to:   rejected

@@ -3,62 +3,26 @@
 namespace SilverStripe\Workflow\Tests;
 
 use SilverStripe\Dev\SapphireTest;
-use SilverStripe\Workflow\WorkflowFactory;
+use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Workflow\WorkflowService;
 use SilverStripe\Workflow\MarkingStore\DataObjectMarkingStore;
+use Symfony\Component\Workflow\WorkflowInterface;
 
-class WorkflowFactoryTest extends SapphireTest
+class WorkflowServiceFactoryTest extends SapphireTest
 {
     public static $extra_dataobjects = [
         TestObject::class,
     ];
-
-    public function tearDown()
-    {
-        parent::tearDown();
-        WorkflowService::reset();
-    }
     
     /**
      * Test factory creation of Workflows.
-     * Would be nicer if I could test using Yaml. But I guess this works.
      */
     public function testInjection() {
-        $factory = new WorkflowFactory();
-        $workflow = $factory->create('testWorkflow', [
-            'marking_store' => [
-                'type' => 'DataObject',
-                'property' => 'CurrentState',
-            ],
-            'supports' => [
-                TestObject::class,
-            ],
-            'initial_marking' => 'draft',
-            'places' => [
-                'draft',
-                'reviewed',
-                'rejected',
-                'published',
-            ],
-            'transitions' =>[
-                'to_review' =>[
-                    'from' => 'draft',
-                    'to' =>   'reviewed',
-                ],
-                'publish' => [
-                    'from' => 'reviewed',
-                    'to' =>   'published',
-                ],
-                'reject' => [
-                    'from' => 'reviewed',
-                    'to' =>   'rejected',
-                ],
-            ],
-        ]);
+        $workflow = Injector::inst()->get('MyWorkflow');
 
         $obj = new TestObject();
-        $this->assertTrue(WorkflowService::registry()->has($obj, 'testWorkflow'));
-        $workflow = WorkflowService::registry()->get($obj, 'testWorkflow');
+        $this->assertTrue(WorkflowService::registry()->has($obj, 'MyWorkflow'));
+        $workflow = WorkflowService::registry()->get($obj);
 
         $markingStore = $workflow->getMarkingStore();
         $this->assertInstanceOf(DataObjectMarkingStore::class, $markingStore);

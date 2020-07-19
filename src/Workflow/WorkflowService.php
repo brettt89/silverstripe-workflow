@@ -3,8 +3,7 @@
 namespace SilverStripe\Workflow;
 
 use SilverStripe\Core\Resettable;
-use Symfony\Component\Workflow\Registry;
-use SilverStripe\Core\Injector\Injectable;
+use SilverStripe\Core\Injector\Injector;
 
 class WorkflowService implements Resettable
 {   
@@ -22,7 +21,7 @@ class WorkflowService implements Resettable
     public static function registry()
     {
         if (!self::$registry) {
-            self::$registry = new Registry();
+            self::$registry = Injector::inst()->get(Registry::class);
         }
 
         return self::$registry;
