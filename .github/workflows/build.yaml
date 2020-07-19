@@ -19,9 +19,17 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
-
+    name: PHPUnit Tests
     steps:
-    - uses: actions/checkout@v2
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '7.4'
+        extensions: intl, json
+        coverage: xdebug
 
     - name: Validate composer.json
       run: composer validate
@@ -45,8 +53,15 @@ jobs:
     - name: Install dependencies
       run: composer install --prefer-dist --no-interaction --no-progress --no-suggest --optimize-autoloader --verbose --profile
 
-    - name: Execute tests
-      run: vendor/bin/phpunit
+    - name: Run PHPUnit Test Coverage
+      run: vendor/bin/phpunit --coverage-clover=coverage.xml
       env:
         SS_DATABASE_CLASS: SQLite3Database
         SS_SQLITE_DATABASE_PATH: /tmp/database-file
+
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v1
+      with:
+        file: ./coverage.xml
+        flags: unittests
+        fail_ci_if_error: false
