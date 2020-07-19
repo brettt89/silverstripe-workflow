@@ -9,3 +9,4 @@ Please feel free to submit your own contributions to this document as pull reque
 - [Using WorkflowService](./workflow-service.md)
 - [Creating a Workflow](./creating-workflow.md)
 - [Using a Workflow](./using-workflow.md)
+- [Using Event Dispatcher](./using-event-dispatcher.md)
