@@ -27,7 +27,7 @@ The registry returned by `WorkflowService` is a [Symfony Workflow Registry](http
 
 You can interact with the Workflow Registry by calling the `registry()` command on the `WorkflowService` class.
 
-```
+```php
 $registry = WorkflowService::registry();
 ```
 
