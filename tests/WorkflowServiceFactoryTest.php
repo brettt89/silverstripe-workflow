@@ -46,6 +46,33 @@ class WorkflowServiceFactoryTest extends SapphireTest
         $this->assertTrue($workflow->can($obj, 'to_review'));
         $this->assertFalse($workflow->can($obj, 'publish'));
 
+        // Mock LoggerInterface for Test Subscriber
+        // Little error_reporting hack to allow for getMockBuilder to work in PHP 7.4
+        $er = error_reporting();
+        error_reporting(E_ALL & ~E_STRICT & ~E_DEPRECATED);
+        $mockLogger = $this->getMockBuilder(\Psr\Log\LoggerInterface::class)
+            ->setMethods([
+                'emergency',
+                'alert',
+                'critical',
+                'error',
+                'warning',
+                'notice',
+                'info',
+                'debug',
+                'log'
+            ])
+            ->getMock();
+        error_reporting($er);
+
+		$mockLogger->expects($this->once())
+            ->method('info')
+            ->with($this->equalTo('Blog post (id: "0") performed transition "to_review" from "" to "reviewed"'));
+        
+        // Create EventDispatcher and add Test Subscriber.
+        $dispatcher = Injector::inst()->get('EventDispatcher');
+        $dispatcher->addSubscriber(new TestLoggerEventSubscriber($mockLogger));
+
         $workflow->apply($obj, 'to_review');
 
         $this->assertTrue($workflow->can($obj, 'publish'));

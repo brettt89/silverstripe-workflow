@@ -2,6 +2,7 @@
 
 namespace SilverStripe\Workflow;
 
+use Psr\EventDispatcher\EventDispatcherInterface;
 use SilverStripe\Core\Injector\Factory as InjectorFactory;
 use SilverStripe\Core\Config\Config;
 use SilverStripe\Workflow\MarkingStore\ViewableDataMarkingStore;
@@ -31,12 +32,13 @@ class WorkflowServiceFactory implements InjectorFactory
         // Start processing the parameters
         $definition = $this->getDefinition($params);
         $markingStore = $this->getMarkingStore($params);
+        $dispatcher = $this->getDispatcher($params);
 
         $supportClass = $this->getSupportClass($params);
         $supportStrategy = new InstanceOfSupportStrategy($supportClass);
 
         // Create workflow
-        $workflow = new Workflow($definition, $markingStore, null, $service);
+        $workflow = new Workflow($definition, $markingStore, $dispatcher, $service);
         
         // Register
         WorkflowService::registry()->addWorkflow($workflow, $supportStrategy);
@@ -135,6 +137,18 @@ class WorkflowServiceFactory implements InjectorFactory
     private function getSupportClass(array $params = []) {
         return array_key_exists('supports', $params) && is_array($params['supports'])
             ? array_shift($params['supports']) 
+            : null;
+    }
+
+    /**
+     * Get support class from Factory Parameters
+     * 
+     * @param array $params Array of parameters passed to self::create() function.
+     * @return mixed
+     */
+    private function getDispatcher(array $params = []) {
+        return array_key_exists('dispatcher', $params) && $params['dispatcher'] instanceof EventDispatcherInterface
+            ? $params['dispatcher']
             : null;
     }
 }

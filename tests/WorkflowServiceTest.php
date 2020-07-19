@@ -78,7 +78,7 @@ class WorkflowServiceTest extends SapphireTest
         
         // Create EventDispatcher and add Test Subscriber.
         $dispatcher = new EventDispatcher();
-        $dispatcher->addSubscriber(new WorkflowServiceTest\TestLoggerEventSubscriber($mockLogger));
+        $dispatcher->addSubscriber(new TestLoggerEventSubscriber($mockLogger));
         
         // Create basic DataObject Workflow and give dispatcher to Workflow.
         $this->setUpBasicDataObjectWorkflow($dispatcher);
