@@ -31,123 +31,12 @@ You can interact with the Workflow Registry by calling the `registry()` command 
 $registry = WorkflowService::registry();
 ```
 
-## Adding a Symfony Workflow
+## Documentation \ How to
 
-This package comes with a `WorkflowFactory` to help generate workflows using the same schema as Symfony.
-
-```
-SilverStripe\Core\Injector\Injector:
-  MyWorkflow:
-    factory: Silverstripe\Workflow\WorkflowFactory
-    properties:
-      marking_store:
-        type: 'DataObject'
-        property: 'currentPlace'
-      supports:
-        - App\Entity\BlogPost
-      initial_marking: draft
-      places:
-        - draft
-        - reviewed
-        - rejected
-        - published
-      transitions:
-        to_review:
-          from: draft
-          to:   reviewed
-        publish:
-          from: reviewed
-          to:   published
-        reject:
-          from: reviewed
-          to:   rejected
-```
-
-You can reference these as per usual.
-
-```
-$workflow = WorkflowService::registry()->get(new App\Entity\BlogPost(), 'MyWorkflow');
-```
-
-Alternatively you can defined the workflow in PHP as per usual.
-
-```
-use SilverStripe\Workflow\DataObjectMarkingStore;
-use SilverStripe\Workflow\WorkflowService;
-use Symfony\Component\Workflow\DefinitionBuilder;
-use Symfony\Component\Workflow\SupportStrategy\InstanceOfSupportStrategy;
-use Symfony\Component\Workflow\Transition;
-use Symfony\Component\Workflow\Workflow;
-
-$definitionBuilder = new DefinitionBuilder();
-$definition = $definitionBuilder->addPlaces(['draft', 'reviewed', 'rejected', 'published'])
-    // Transitions are defined with a unique name, an origin place and a destination place
-    ->addTransition(new Transition('to_review', 'draft', 'reviewed'))
-    ->addTransition(new Transition('publish', 'reviewed', 'published'))
-    ->addTransition(new Transition('reject', 'reviewed', 'rejected'))
-    ->build()
-;
-
-$singleState = true; // true if the subject can be in only one state at a given time
-$property = 'CurrentState'; // subject property name where the state is stored
-$marking = new DataObjectMarkingStore($singleState, $property);
-$workflow = new Workflow($definition, $marking);
-```
-
-Then add the Workflow to the Registry.
-
-```
-WorkflowService::registry()->addWorkflow($testWorkflow, new InstanceOfSupportStrategy(MyApp\MyDataObject::class));
-```
-
-> A `DataObjectMarkingStore` class has been provided for easy usage with DataObjects and any other class that extends `ViewableData`. Using this store will allow you to define a Database Field as the "State Storage" propery.
-> NOTE: This will trigger a `write` whenever a transition occurs to update the State on the object.
-
-## Impementing a Workflow
-
-Your Workflow can be accessed from anywher inside of a SilverStripe application, so usage of Workflows can be expanded on almost anywhere. Below is a example of how a Workflow might be used when publishing a comment on a blog article.
-
-```
-namespace MyApp;
-
-use SilverStripe\ORM\DataObject;
-use SilverStripe\Workflow\WorkflowService;
-
-class BlogArtice extends DataObject
-{   
-    // ...
-
-    public function publishComment(Comment $comment)
-    {
-        $workflow = WorkflowService::registry()->get($comment);
-
-        // Update the currentState on the post
-        try {
-            $workflow->apply($post, 'publish');
-        } catch (LogicException $exception) {
-            // ...
-        }
-        // ...
-    }
-
-    public function rejectComment(Comment $comment)
-    {
-        $workflow = WorkflowService::registry()->get($comment);
-
-        // Update the currentState on the post
-        try {
-            $workflow->apply($post, 'reject');
-        } catch (LogicException $exception) {
-            // ...
-        }
-        // ...
-    }
-}
-
-```
-
-## Documentation
+For SilverStripe documentation, see [SilverStripe Workflow Documentation](./docs/en/index.md).
 
 For further information on usage of Workflows and other functionality such as Events, etc. See the [Symfony Workflow](https://symfony.com/doc/current/workflow.html) documentation.
 
 ## Contributing
+
+Please submit all contributions to this repository as pull requests to the `master` branch.

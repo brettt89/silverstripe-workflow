@@ -1,0 +1,68 @@
+####
+#
+#  Example manual creation of Workflow using Injector.
+#
+#  NOTE: The elements passed to the "constructor" MUST be in numerical order. The key's are not used in anyway.
+#
+#        E.g. 'name: MyWorkflow' is actually passed to __construct() as '[ 0 => "MyWorkflow" ]' the the key being
+#             what order and position it was located within 'constructor:'.
+#
+####
+SilverStripe\Core\Injector\Injector:
+
+  ## Example Workflow
+  MyWorkflow:
+    class: Symfony\Component\Workflow\Workflow
+    constructor:
+      definition: '%$MyDefinition'
+      marking_store: '%$MyMarkingStore'
+      dispatcher: 
+      name: MyWorkflow
+
+  ## Example Workflow Definition
+  MyDefinition:
+    class: Symfony\Component\Workflow\Definition
+    constructor:
+      places:
+        - draft
+        - reviewed
+        - rejected
+        - published
+      transitions:
+        - '%$ToReviewTransition'
+        - '%$PublishTransition'
+        - '%$RejectTransition'
+      initial_place: draft
+      metadata_store: '%$MyMetadataStore'
+
+  ## Example Workflow Transitions
+  ToReviewTransition:
+    class: Symfony\Component\Workflow\Transition
+    constructor:
+      name: to_review
+      from: draft
+      to: reviewed
+
+  PublishTransition:
+    class: Symfony\Component\Workflow\Transition
+    constructor:
+      name: publish
+      from: reviewed
+      to: published
+
+  RejectTransition:
+    class: Symfony\Component\Workflow\Transition
+    constructor:
+      name: reject
+      from: reviewed
+      to: rejected
+
+  ## Example MarkingStore
+  MyMarkingStore:
+    class: SilverStripe\Workflow\DataObjectMarkingStore
+    constructor:
+      property: CurrentState
+
+  ## Example MetaDataStore
+  MyMetadataStore:
+    class: Symfony\Component\Workflow\Metadata\InMemoryMetadataStore

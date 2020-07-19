@@ -1,0 +1,35 @@
+####
+#
+#  Example creation (and auto registry) of a workflow.
+#
+#  NOTE: This uses the same format as the Symfony Service YAML.
+#            https://symfony.com/doc/current/workflow.html#creating-a-workflow
+#
+#  NOTE: Dispatcher not yet supported.
+#
+####
+SilverStripe\Core\Injector\Injector:
+  MyWorkflow:
+    factory: SilverStripe\Workflow\WorkflowServiceFactory
+    constructor:
+      marking_store:
+        type: 'DataObject'
+        property: 'CurrentState'
+      supports:
+        - SilverStripe\Workflow\Tests\TestObject
+      initial_marking: draft
+      places:
+        - draft
+        - reviewed
+        - rejected
+        - published
+      transitions:
+        to_review:
+          from: draft
+          to:   reviewed
+        publish:
+          from: reviewed
+          to:   published
+        reject:
+          from: reviewed
+          to:   rejected
