@@ -1,5 +1,5 @@
 {
-    "name": "silverstripe/silverstripe-workflow",
+    "name": "brettt89/silverstripe-workflow",
     "description": "Adds configurable workflow support to the ORM",
     "keywords": ["silverstripe", "workflow"],
     "license": [
