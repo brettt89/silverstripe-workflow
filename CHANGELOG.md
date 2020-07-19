@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.2.0](https://github.com/brettt89/silverstripe-workflow/tree/0.2.0) (2020-07-19)
+
+[Full Changelog](https://github.com/brettt89/silverstripe-workflow/compare/0.1.2...0.2.0)
+
+**Implemented enhancements:**
+
+- Add EventDispatcher parameter to WorkflowServiceFactory [\#1](https://github.com/brettt89/silverstripe-workflow/pull/1) ([brettt89](https://github.com/brettt89))
+
+## [0.1.2](https://github.com/brettt89/silverstripe-workflow/tree/0.1.2) (2020-07-18)
+
+[Full Changelog](https://github.com/brettt89/silverstripe-workflow/compare/0.1.1...0.1.2)
+
+## [0.1.1](https://github.com/brettt89/silverstripe-workflow/tree/0.1.1) (2020-07-18)
+
+[Full Changelog](https://github.com/brettt89/silverstripe-workflow/compare/0.1.0...0.1.1)
+
 ## [0.1.0](https://github.com/brettt89/silverstripe-workflow/tree/0.1.0) (2020-07-18)
 
 [Full Changelog](https://github.com/brettt89/silverstripe-workflow/compare/09a1effe8f7635eda36a44b27726f576dc5856c8...0.1.0)
