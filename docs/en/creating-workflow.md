@@ -7,7 +7,7 @@ Workflows can be created using YML via the Injector, or directly in PHP. For mor
 This module comes with a `WorkflowServiceFactory` which can be used to create (and register) a workflow using the same format as documented on the [Symfony Workflow Documentation](https://symfony.com/doc/current/workflow.html).
 
 [Example YML](./examples/workflow.yml)
-```php
+```yaml
 SilverStripe\Core\Injector\Injector:
   MyWorkflow:
     factory: SilverStripe\Workflow\WorkflowServiceFactory
