@@ -18,8 +18,6 @@ class WorkflowServiceFactory implements InjectorFactory
 {   
     const DEFAULT_METHOD = 'ViewableData';
     const DEFAULT_PROPERTY = 'CurrentState';
-
-    public $markingStore;
     
     /**
      * Creates a new service instance.

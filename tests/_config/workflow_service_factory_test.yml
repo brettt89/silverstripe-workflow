@@ -3,7 +3,7 @@ SilverStripe\Core\Injector\Injector:
     factory: SilverStripe\Workflow\WorkflowServiceFactory
     constructor:
       marking_store:
-        type: 'DataObject'
+        type: 'BadType'
         property: 'CurrentState'
       supports:
         - SilverStripe\Workflow\Tests\TestObject
@@ -17,6 +17,26 @@ SilverStripe\Core\Injector\Injector:
         to_review:
           from: draft
           to:   reviewed
+        publish:
+          from: reviewed
+          to:   published
+        reject:
+          from: reviewed
+          to:   rejected
+  MySecondWorkflow:
+    factory: SilverStripe\Workflow\WorkflowServiceFactory
+    constructor:
+      supports:
+        - SilverStripe\Workflow\Tests\TestObject
+      initial_marking: draft
+      places:
+        - draft
+        - reviewed
+        - rejected
+        - published
+      transitions:
+        to_review:
+          from: draft
         publish:
           from: reviewed
           to:   published

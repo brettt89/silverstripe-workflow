@@ -24,4 +24,14 @@ class TestObject extends DataObject implements TestOnly
             exit();
         }
     }
+
+    public function getCurrentState()
+    {
+        return $this->getField('CurrentState');
+    }
+
+    public function setCurrentState($value)
+    {
+        return $this->setField('CurrentState', $value);
+    }
 }

@@ -32,7 +32,7 @@ class ViewableDataMarkingStore implements MarkingStoreInterface
         }
 
         if (!$subject->hasField($this->property)) {
-            throw new LogicException(sprintf('Field "%s" does not exist in "%s"', $this->property, get_debug_type($subject)));
+            throw new LogicException(sprintf('Field "%s" does not exist in subject "%s"', $this->property, get_debug_type($subject)));
         }
 
         $marking = $subject->getField($this->property);
@@ -56,7 +56,7 @@ class ViewableDataMarkingStore implements MarkingStoreInterface
         }
 
         if (!$subject->hasField($this->property)) {
-            throw new LogicException(sprintf('Field "%s" does not exist in "%s"', $this->property, get_debug_type($subject)));
+            throw new LogicException(sprintf('Field "%s" does not exist in subject "%s"', $this->property, get_debug_type($subject)));
         }
 
         $marking = $marking->getPlaces();
